@@ -13,14 +13,10 @@ for (var i = 0; i < m; i++) {
   player2.push(cardp2);
 }
 
-var scorep1 = 0;
-var scorep2 = 0;
 var turn = 0;
 var pat = false;
 while (true) {
   turn++;
-  printErr("P1", player1);
-  printErr("p2", player2);
   if (player1.length === 0 || player2.length === 0) {
     pat = true;
     break;
@@ -33,7 +29,6 @@ while (true) {
     player1.push(player1[0], player2[0]);
     player1.shift();
     player2.shift();
-    scorep1++;
   }
 
   // player 2 gagne
@@ -41,12 +36,10 @@ while (true) {
     player2.push(player1[0], player2[0]);
     player1.shift();
     player2.shift();
-    scorep2++;
   }
 
   // ex aequo
   if (cardp1Value === cardp2Value) {
-    printErr("EXAEQUO");
     var tempCardp1 = player1.slice(0, 4);
     var tempCardp2 = player2.slice(0, 4);
 
@@ -60,22 +53,94 @@ while (true) {
     var cardp1Value = cards.indexOf(player1[0].charAt(0));
     var cardp2Value = cards.indexOf(player2[0].charAt(0));
     if (cardp1Value > cardp2Value) {
-      player1 = player1.concat(tempCardp1);
-      player1.push(player1[0]);
-      player1 = player1.concat(tempCardp2);
-      player1.push(player2[0]);
+      player1 = player1.concat(tempCardp1, player1[0], tempCardp2, player2[0]);
       player1.shift();
       player2.shift();
-      scorep1++;
     }
     if (cardp1Value < cardp2Value) {
-      player2 = player2.concat(tempCardp1);
-      player2.push(player1[0]);
-      player2 = player1.concat(tempCardp2);
-      player2.push(player2[0]);
+      player2 = player2.concat(tempCardp1, player1[0], tempCardp2, player2[0]);
       player1.shift();
       player2.shift();
-      scorep2++;
+    }
+    // TODO : Recursive
+    if (cardp1Value === cardp2Value) {
+      var temp2Cardp1 = player1.slice(0, 4);
+      var temp2Cardp2 = player2.slice(0, 4);
+      player1.splice(0, 4);
+      player2.splice(0, 4);
+
+      if (player1.length === 0 || player2.length === 0) {
+        pat = true;
+        break;
+      }
+      var cardp1Value = cards.indexOf(player1[0].charAt(0));
+      var cardp2Value = cards.indexOf(player2[0].charAt(0));
+      if (cardp1Value > cardp2Value) {
+        player1 = player1.concat(
+          tempCardp1,
+          temp2Cardp1,
+          player1[0],
+          tempCardp2,
+          temp2Cardp2,
+          player2[0]
+        );
+        player1.shift();
+        player2.shift();
+      }
+      if (cardp1Value < cardp2Value) {
+        player2 = player2.concat(
+          tempCardp1,
+          temp2Cardp1,
+          player1[0],
+          tempCardp2,
+          temp2Cardp2,
+          player2[0]
+        );
+        player1.shift();
+        player2.shift();
+      }
+      // TODO : Recursive
+      if (cardp1Value === cardp2Value) {
+        var temp3Cardp1 = player1.slice(0, 4);
+        var temp3Cardp2 = player2.slice(0, 4);
+        player1.splice(0, 4);
+        player2.splice(0, 4);
+
+        if (player1.length === 0 || player2.length === 0) {
+          pat = true;
+          break;
+        }
+        var cardp1Value = cards.indexOf(player1[0].charAt(0));
+        var cardp2Value = cards.indexOf(player2[0].charAt(0));
+        if (cardp1Value > cardp2Value) {
+          player1 = player1.concat(
+            tempCardp1,
+            temp2Cardp1,
+            temp3Cardp1,
+            player1[0],
+            tempCardp2,
+            temp2Cardp2,
+            temp3Cardp2,
+            player2[0]
+          );
+          player1.shift();
+          player2.shift();
+        }
+        if (cardp1Value < cardp2Value) {
+          player2 = player2.concat(
+            tempCardp1,
+            temp2Cardp1,
+            temp3Cardp1,
+            player1[0],
+            tempCardp2,
+            temp2Cardp2,
+            temp3Cardp2,
+            player2[0]
+          );
+          player1.shift();
+          player2.shift();
+        }
+      }
     }
   }
 
@@ -84,9 +149,8 @@ while (true) {
   }
 }
 
-var result = scorep1 > scorep2 ? `1 ${turn}` : `2 ${turn}`;
-if (pat === true) {
+if (pat) {
   print("PAT");
 } else {
-  print(result);
+  print(player1.length > player2.length ? `1 ${turn}` : `2 ${turn}`);
 }
